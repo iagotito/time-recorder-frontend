@@ -1,0 +1,58 @@
+* {
+    box-sizing: border-box;
+}
+
+table {
+    width: 100%;
+    border-spacing: 0;
+    border-radius: 1em;
+    overflow: hidden;
+
+    max-width: 1200px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+}
+
+thead {
+    /*visibility: hidden;*/
+    position: relative;
+    width: 0;
+    height: 0;
+
+    visibility: visible;
+    position: relative;
+}
+
+th {
+    background: #215A8E;
+    color: #fff;
+
+    text-align: center;
+    /*text-transform: uppercase;*/
+    font-size: .9em;
+}
+
+tr {
+    display: table-row;
+    border: none;
+    border-radius: 0;
+    text-align: center;
+}
+
+td {
+    display: table-cell;
+    position: relative;
+}
+
+tr:nth-child(even) {
+    background-color: #ddd;
+
+}
+
+tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+th, td {
+    padding: 5px;
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Time recorder</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+  </head>
+  <body>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+
+    <div id="log-div">
+      <input
+      id="log-input"
+      type="text"
+      placeholder="type the log"
+      autocomplete="off"
+      />
+      <br><br>
+      <button id="log-btn">
+        Log activity
+      </button>
+    </div>
+
+    <br>
+
+    <table id="activities-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Date</th>
+          <th>Beginning</th>
+          <th>End</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
+    <script src="/scripts/main.js"></script>
+  </body>
+</html>
