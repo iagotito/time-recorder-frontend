@@ -1,4 +1,6 @@
 let API_URL = "http://localhost:8001";
+let ACTIVITY_FIELDS = ["name", "description", "date", "beginning", "end", "total"];
+
 
 let $logBtn = document.querySelector("#log-btn");
 $logBtn.addEventListener("click", logActivity);
@@ -39,18 +41,31 @@ function logActivity() {
     })
     .then(res => { return res.json(); })
     .then(data => {
-        appendToTable(data.activity);
+        if (data.new_activity !== null) {
+            appendToTable(data.new_activity);
+        }
+        if (data.finished_activity !== null) {
+            updateActivity(data.finished_activity);
+        }
     })
     .catch(err => { console.log(err); })
 }
 
-function appendToTable(activity) {
-    let ACTIVITY_FIELDS = ["name", "description", "date", "beginning", "end", "total"];
+function updateActivity(activity) {
+    let $activityRow = document.getElementById(activity._id);
 
+    $activityRow.childNodes.forEach(element => {
+        element.innerText = activity[element.class];
+    });
+}
+
+function appendToTable(activity) {
     let row = $activitiesTable.insertRow(-1);
+    row.id = activity._id;
 
     for (let i = 0; i < ACTIVITY_FIELDS.length; i++) {
         let cell = row.insertCell(i);
+        cell.class = ACTIVITY_FIELDS[i]
 
         let text;
         if (activity[ACTIVITY_FIELDS[i]] === null || activity[ACTIVITY_FIELDS[i]] === -1) {
