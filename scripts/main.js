@@ -1,11 +1,13 @@
 let API_URL = "http://localhost:8001";
 let ACTIVITY_FIELDS = ["name", "description", "beginning", "end", "total"];
 
-
 let $logBtn = document.querySelector("#log-btn");
 $logBtn.addEventListener("click", logActivity);
 
 let $logInput = document.querySelector("#log-input");
+
+let $downloadBtn = document.querySelector("#download-btn");
+$downloadBtn.addEventListener("click", downloadData);
 
 let $activitiesTable = document.querySelector("#activities-table");
 
@@ -88,6 +90,7 @@ function appendToTable(activity) {
     cell.className = "edit-cell";
     let editBtn = document.createElement("div");
     editBtn.className = "edit-btn";
+    editBtn.title = "Edit row";
     editBtn.addEventListener("click", function () {
         editRow(activity._id);
     });
@@ -107,6 +110,7 @@ function editRow(activity_id) {
     confirmCell.className = "confirm-edit-cell";
     let confirmEditBtn = document.createElement("div");
     confirmEditBtn.className = "confirm-edit-btn";
+    confirmEditBtn.title = "Confirm";
     confirmEditBtn.addEventListener("click", function () {
         saveRowEdit(activity_id, $row);
     });
@@ -116,6 +120,7 @@ function editRow(activity_id) {
     cancelCell.className = "cancel-edit-cell";
     let cancelEditBtn = document.createElement("div");
     cancelEditBtn.className = "cancel-edit-btn";
+    cancelEditBtn.title = "Cancel";
     cancelEditBtn.addEventListener("click", function () {
         $row.innerHTML = rowBeforeEdit;
         setEditBtnListener($row.id);
@@ -162,4 +167,23 @@ function setEditBtnListener(rowId) {
     editBtn.addEventListener("click", function () {
         editRow($row.id);
     });
+}
+
+function downloadData() {
+    let date = (new Date()).toISOString().split('T')[0];
+    fetch(API_URL + `/download?date=${date}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
+    .then(res => { return res.blob(); })
+    .then(blob => {
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = `${date}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    })
+    .catch(err => { console.log(err); })
 }
