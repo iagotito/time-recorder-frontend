@@ -1,5 +1,5 @@
 let API_URL = "http://localhost:8001";
-let ACTIVITY_FIELDS = ["name", "description", "date", "beginning", "end", "total"];
+let ACTIVITY_FIELDS = ["name", "description", "beginning", "end", "total"];
 
 
 let $logBtn = document.querySelector("#log-btn");
@@ -22,16 +22,18 @@ function loadStoredActivities() {
     .then(data => {
         activities = data.activities;
         activities.forEach(activity => appendToTable(activity));
-        //displayActivities();
     })
     .catch(err => { console.log(err); })
 }
 
 function logActivity() {
-    let text = $logInput.value;
+    let text = $logInput.value.split(" ");
+    let name = text[0];
+    let description = text.slice(1).join(" ");
 
     let activity = {
-        "name": text
+        "name": name,
+        "description": description
     }
 
     fetch(API_URL + "/activities", {
@@ -55,17 +57,21 @@ function updateActivity(activity) {
     let $activityRow = document.getElementById(activity._id);
 
     $activityRow.childNodes.forEach(element => {
-        element.innerText = activity[element.class];
+        let column = element.className.split(" ")[0];
+        if (activity[column] !== undefined) {
+            element.innerText = activity[column];
+        }
     });
 }
 
 function appendToTable(activity) {
-    let row = $activitiesTable.insertRow(-1);
+    let $tbody = $activitiesTable.getElementsByTagName("tbody")[0];
+    let row = $tbody.insertRow(-1);
     row.id = activity._id;
 
     for (let i = 0; i < ACTIVITY_FIELDS.length; i++) {
         let cell = row.insertCell(i);
-        cell.class = ACTIVITY_FIELDS[i]
+        cell.className = `${ACTIVITY_FIELDS[i]} text-area`
 
         let text;
         if (activity[ACTIVITY_FIELDS[i]] === null || activity[ACTIVITY_FIELDS[i]] === -1) {
@@ -77,4 +83,83 @@ function appendToTable(activity) {
         let cellText = document.createTextNode(text);
         cell.appendChild(cellText);
     }
+
+    let cell = row.insertCell(-1);
+    cell.className = "edit-cell";
+    let editBtn = document.createElement("div");
+    editBtn.className = "edit-btn";
+    editBtn.addEventListener("click", function () {
+        editRow(activity._id);
+    });
+    cell.appendChild(editBtn);
+}
+
+function editRow(activity_id) {
+    let $row = document.getElementById(activity_id);
+    let textAreas = $row.getElementsByClassName("text-area");
+    for (let element of textAreas) {
+        element.contentEditable = true;
+    };
+    let rowBeforeEdit = $row.innerHTML;
+    $row.deleteCell(-1);
+
+    let confirmCell = $row.insertCell(-1);
+    confirmCell.className = "confirm-edit-cell";
+    let confirmEditBtn = document.createElement("div");
+    confirmEditBtn.className = "confirm-edit-btn";
+    confirmEditBtn.addEventListener("click", function () {
+        saveRowEdit(activity_id, $row);
+    });
+    confirmCell.appendChild(confirmEditBtn);
+
+    let cancelCell = $row.insertCell(-1);
+    cancelCell.className = "cancel-edit-cell";
+    let cancelEditBtn = document.createElement("div");
+    cancelEditBtn.className = "cancel-edit-btn";
+    cancelEditBtn.addEventListener("click", function () {
+        $row.innerHTML = rowBeforeEdit;
+        setEditBtnListener($row.id);
+        for (let element of textAreas) {
+            element.contentEditable = false;
+        };
+    });
+    cancelCell.appendChild(cancelEditBtn);
+}
+
+function saveRowEdit(activity_id, $row) {
+    let editedActivity = {}
+    ACTIVITY_FIELDS.forEach(fieldName => {
+        editedActivity[fieldName] = $row.getElementsByClassName(fieldName)[0].innerText;
+    });
+    fetch(API_URL + `/activity/${activity_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editedActivity)
+    })
+    .then(res => { return res.json(); })
+    .then(data => {
+        ACTIVITY_FIELDS.forEach(fieldName => {
+            $row.getElementsByClassName(fieldName)[0].innerText = data.updated_activity[fieldName];
+        });
+        $row.deleteCell(-1);
+        $row.deleteCell(-1);
+        let cell = $row.insertCell(-1);
+        cell.className = "edit-cell";
+        let editBtn = document.createElement("div");
+        editBtn.className = "edit-btn";
+        editBtn.addEventListener("click", function () {
+            editRow(activity_id);
+        });
+        cell.appendChild(editBtn);
+
+    })
+    .catch(err => { console.log(err); })
+}
+
+function setEditBtnListener(rowId) {
+    let $row = document.getElementById(rowId);
+    let editBtn = $row.getElementsByClassName("edit-btn")[0];
+    editBtn.addEventListener("click", function () {
+        editRow($row.id);
+    });
 }

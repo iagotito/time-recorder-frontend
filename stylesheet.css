@@ -56,3 +56,24 @@ tr:nth-child(odd) {
 th, td {
     padding: 5px;
 }
+
+.edit-btn {
+    background: url(images/edit.svg) no-repeat;
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
+.confirm-edit-btn {
+    background: url(images/confirm.svg) no-repeat;
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
+.cancel-edit-btn {
+    background: url(images/cancel.svg) no-repeat;
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
